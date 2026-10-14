@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-MZ">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eu Amo Salgados - Nampula</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Pacifico&display=swap" rel="stylesheet">
+<style>
+:root{--amarelo:#FFC018;--preto:#222}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif}
+body{background:var(--preto)}
+.topo{background:var(--preto);color:var(--amarelo);text-align:center;padding:30px 15px 80px;position:relative}
+.topo h1{font-family:'Pacifico',cursive;font-size:52px;line-height:1;transform:rotate(-3deg)}
+.topo h1 span{font-family:'Poppins',sans-serif;font-weight:800;font-size:38px;display:block;letter-spacing:2px;margin-top:5px}
+.curva{position:absolute;bottom:-1px;left:0;width:100%;height:80px;background:var(--amarelo);border-radius:100% 100% 0 0 / 100% 100% 0 0}
+.container{background:var(--amarelo);padding:25px 15px 140px;min-height:100vh}
+.categoria{margin-bottom:25px}
+.categoria h2{font-family:'Pacifico',cursive;font-size:26px;margin-bottom:12px;border-bottom:2px dashed #222;display:inline-block}
+.card{background:#fff;border-radius:16px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.info h3{font-size:13px;text-transform:uppercase}
+.preco{font-weight:800;font-size:14px;margin-top:3px}
+.acoes{display:flex;align-items:center;gap:8px}
+.qtd{display:flex;align-items:center;background:#f5f5f5;border-radius:20px;padding:3px}
+.qtd button{width:28px;height:28px;border:0;background:#222;color:#fff;border-radius:50%;font-weight:800;cursor:pointer}
+.qtd span{width:30px;text-align:center;font-size:13px;font-weight:700}
+.add{background:var(--preto);color:var(--amarelo);border:0;padding:8px 12px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer}
+.carrinho-btn{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#222;color:var(--amarelo);width:90%;max-width:420px;padding:14px 20px;border-radius:30px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 10px 30px rgba(0,0,0,.4);z-index:999;cursor:pointer}
+.carrinho-box{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;z-index:1000;justify-content:flex-end}
+.carrinho-box.ativo{display:flex}
+.carrinho-conteudo{background:#fff;width:100%;max-width:420px;height:100%;padding:20px;overflow-y:auto;border-radius:20px 0 0 20px}
+.item-carrinho{display:flex;justify-content:space-between;margin-bottom:10px;font-size:13px;border-bottom:1px dashed #ddd;padding-bottom:8px}
+.pagamento label{display:block;background:#f5f5f5;padding:12px;border-radius:12px;margin-bottom:8px;font-size:13px;cursor:pointer;border:2px solid transparent}
+.pagamento label:has(input:checked){border-color:#222;background:#fff8dd}
+.input-box{width:100%;padding:12px;border-radius:10px;border:1px solid #ddd;margin-bottom:8px}
+.total{font-weight:800;font-size:18px;display:flex;justify-content:space-between;margin:15px 0}
+.btn-pagar{background:#222;color:var(--amarelo);border:0;width:100%;padding:15px;border-radius:12px;font-weight:800;font-size:15px;cursor:pointer;margin-top:10px}
+.btn-whats{background:#25D366;color:#fff;border:0;width:100%;padding:15px;border-radius:12px;font-weight:800;font-size:15px;cursor:pointer;display:none;justify-content:center;gap:8px;margin-top:10px}
+.status-pag{display:none;padding:15px;border-radius:12px;text-align:center;margin-top:15px;font-weight:700}
+.status-pag.sucesso{display:block;background:#e6ffe6;color:#0a7a0a;border:1px solid #0a7a0a}
+.btn-fechar{background:transparent;border:0;font-size:26px;float:right;cursor:pointer}
+</style>
+</head>
+<body>
+
+<div class="topo">
+ <h1>Eu ♡<span>SALGADOS</span></h1>
+ <div class="curva"></div>
+</div>
+
+<div class="container" id="produtos">
+ <div class="categoria"><h2>mini salgados</h2><div id="lista-mini-salgados"></div></div>
+ <div class="categoria"><h2>Mini mims</h2><div id="lista-mini-mims"></div></div>
+</div>
+
+<div class="carrinho-btn" id="abrirCarrinho"><span>🛒 Ver Pedido</span><span id="resumoBtn">0 itens - 0 MT</span></div>
+
+<div class="carrinho-box" id="carrinhoBox">
+ <div class="carrinho-conteudo">
+  <button class="btn-fechar" id="fecharCarrinho">×</button>
+  <h3>Seu Pedido</h3>
+  <div id="itensCarrinho"></div>
+
+  <div style="margin:18px 0">
+   <input id="nomeCliente" class="input-box" placeholder="Seu nome completo">
+   <input id="bairroCliente" class="input-box" placeholder="Bairro / Local de entrega">
+  </div>
+
+  <div class="pagamento">
+   <p style="font-weight:700;margin-bottom:8px;font-size:13px">Escolha como pagar no site:</p>
+   <label><input type="radio" name="pag" value="M-Pesa" checked onchange="trocarPag()"> <span>📱 M-Pesa - Pagar no site</span></label>
+   <label><input type="radio" name="pag" value="eMola" onchange="trocarPag()"> <span>📱 eMola - Pagar no site</span></label>
+   <label><input type="radio" name="pag" value="Banco" onchange="trocarPag()"> <span>🏦 Transferência Bancária</span></label>
+  </div>
+
+  <div id="areaPagamento">
+   <input id="telPagamento" class="input-box" placeholder="Número M-Pesa / eMola: ex 84xxxxxxx">
+   <p style="font-size:11px;opacity:.6;margin-bottom:8px">Não pedimos PIN. Você vai receber pedido de confirmação no seu celular.</p>
+  </div>
+
+  <div id="areaBanco" style="display:none">
+   <div style="background:#f5f5f5;padding:12px;border-radius:10px;font-size:12px;margin-bottom:8px">
+   <b>Dados para transferência:</b><br>
+   Banco: BIM<br>Conta: 123456789<br>Titular: Eu Amo Salgados<br>Depois anexe comprovativo no WhatsApp
+   </div>
+  </div>
+
+  <div class="total"><span>Total:</span><span id="totalPreco">0 MT</span></div>
+
+  <button class="btn-pagar" id="btnPagar">💳 PAGAR AGORA NO SITE</button>
+
+  <div id="statusPagamento" class="status-pag"></div>
+
+  <button class="btn-whats" id="enviarWhats">📲 CONFIRMAR NO WHATSAPP DA DONA</button>
+  <p style="font-size:11px;text-align:center;margin-top:10px;opacity:.6">Seu WhatsApp: 85 073 0250 vai receber a confirmação</p>
+ </div>
+</div>
+
+<script>
+const produtos=[
+ {id:1,nome:"12 Chamussas",preco:300,cat:"salgados"},
+ {id:2,nome:"12 Rissois",preco:350,cat:"salgados"},
+ {id:3,nome:"12 Springrolls",preco:300,cat:"salgados"},
+ {id:4,nome:"12 Conchinhas",preco:350,cat:"salgados"},
+ {id:5,nome:"12 Almofadinhas",preco:300,cat:"salgados"},
+ {id:6,nome:"12 Croquetes",preco:350,cat:"salgados"},
+ {id:7,nome:"12 Mini Burguer",preco:1800,cat:"mims"},
+ {id:8,nome:"12 Mini Cachorro",preco:1800,cat:"mims"},
+ {id:9,nome:"12 Mini Prego",preco:1800,cat:"mims"},
+ {id:10,nome:"12 Mini Pizza",preco:750,cat:"mims"},
+ {id:11,nome:"12 Enroladinhos de Salsicha",preco:350,cat:"mims"},
+];
+let carrinho={};
+const numeroWhats="258850730250"; // SEU NÚMERO NOVO
+let pagamentoFeito=false;
+let idTransacao="";
+
+function renderProdutos(){
+ const contS=document.getElementById('lista-mini-salgados');
+ const contM=document.getElementById('lista-mini-mims');
+ produtos.forEach(p=>{
+  const div=document.createElement('div');div.className='card';
+  div.innerHTML=`<div class="info"><h3>${p.nome}</h3><div class="preco">${p.preco} MT</div></div><div class="acoes"><div class="qtd"><button onclick="mudarQtd(${p.id},-1)">-</button><span id="qtd-${p.id}">0</span><button onclick="mudarQtd(${p.id},1)">+</button></div><button class="add" onclick="addCarrinho(${p.id})">ADD</button></div>`;
+  if(p.cat==='salgados') contS.appendChild(div); else contM.appendChild(div);
+ });
+}
+function mudarQtd(id,delta){const el=document.getElementById(`qtd-${id}`);let v=parseInt(el.innerText)+delta;if(v<0)v=0;el.innerText=v;}
+function addCarrinho(id){const q=parseInt(document.getElementById(`qtd-${id}`).innerText);if(q===0)return;const prod=produtos.find(x=>x.id===id);carrinho[id]={...prod,qtd:(carrinho[id]?.qtd||0)+q};document.getElementById(`qtd-${id}`).innerText=0;atualizarCarrinho();}
+function atualizarCarrinho(){let total=0,itens=0,html='';for(let k in carrinho){const it=carrinho[k];total+=it.preco*it.qtd;itens+=it.qtd;html+=`<div class="item-carrinho"><span>${it.qtd}x ${it.nome}</span><span>${it.preco*it.qtd} MT</span></div>`}document.getElementById('resumoBtn').innerText=`${itens} itens - ${total} MT`;document.getElementById('totalPreco').innerText=`${total} MT`;document.getElementById('itensCarrinho').innerHTML=html||'<p style="opacity:.5;font-size:13px">Carrinho vazio</p>';}
+function trocarPag(){const v=document.querySelector('input[name="pag"]:checked').value;document.getElementById('areaPagamento').style.display=v==='Banco'?'none':'block';document.getElementById('areaBanco').style.display=v==='Banco'?'block':'none';}
+
+document.getElementById('abrirCarrinho').onclick=()=>document.getElementById('carrinhoBox').classList.add('ativo');
+document.getElementById('fecharCarrinho').onclick=()=>document.getElementById('carrinhoBox').classList.remove('ativo');
+
+document.getElementById('btnPagar').onclick=()=>{
+ if(Object.keys(carrinho).length===0){alert('Adicione produtos!');return;}
+ const nome=document.getElementById('nomeCliente').value; if(!nome){alert('Digite seu nome');return;}
+ const tel=document.getElementById('telPagamento').value; const pag=document.querySelector('input[name="pag"]:checked').value;
+ if(pag!=='Banco' &&!tel){alert('Digite seu número M-Pesa/eMola');return;}
+
+ const btn=document.getElementById('btnPagar'); btn.innerText='⏳ PROCESSANDO PAGAMENTO...'; btn.disabled=true;
+ // Simulação de pagamento real
+ setTimeout(()=>{
+  idTransacao='MP'+Math.floor(Math.random()*900000+100000);
+  pagamentoFeito=true;
+  const total=document.getElementById('totalPreco').innerText;
+  document.getElementById('statusPagamento').className='status-pag sucesso';
+  document.getElementById('statusPagamento').innerHTML=`✅ PAGAMENTO EFETUADO!<br>ID: ${idTransacao}<br>${total} via ${pag}<br><small>Valor debitado com sucesso</small>`;
+  document.getElementById('statusPagamento').style.display='block';
+  btn.style.display='none';
+  document.getElementById('enviarWhats').style.display='flex';
+  // Notificação automática para você ver como fica
+  alert('Pagamento simulado com sucesso! Agora clique em CONFIRMAR NO WHATSAPP');
+ },2000);
+};
+
+document.getElementById('enviarWhats').onclick=()=>{
+ if(!pagamentoFeito){alert('Faça o pagamento primeiro!');return;}
+ const nome=document.getElementById('nomeCliente').value||'Cliente';
+ const bairro=document.getElementById('bairroCliente').value||'A combinar';
+ const pag=document.querySelector('input[name="pag"]:checked').value;
+ let msg=`*NOVO PEDIDO PAGO - Eu Amo Salgados*%0A%0A`;
+ msg+=`👤 Cliente: ${nome}%0A📍 Bairro: ${bairro}%0A💳 Pagamento: ${pag} - *PAGO*%0A🆔 Transação: ${idTransacao}%0A%0A*Itens:*%0A`;
+ let total=0; for(let k in carrinho){const it=carrinho[k];msg+=`• ${it.qtd}x ${it.nome} - ${it.preco*it.qtd} MT%0A`;total+=it.preco*it.qtd;}
+ msg+=`%0A*TOTAL PAGO: ${total} MT*%0A%0A✅ Site confirmou pagamento. Por favor confirme recebimento.`;
+ window.open(`https://wa.me/${numeroWhats}?text=${msg}`, '_blank');
+};
+
+renderProdutos();
+</script>
+</body>
+</html>
